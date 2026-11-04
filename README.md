@@ -67,6 +67,22 @@ com.dotorich
 - 단계 상태는 Part 2 `learning`에만 저장한다. 다른 파트는 읽기만 한다.
 - 하루 기준은 KST 0시. 서버 시간대는 `Asia/Seoul`로 고정되어 있다.
 
+## 파트 간에 호출하는 것
+
+| 무엇 | 어디 | 누가 쓰나 |
+| --- | --- | --- |
+| 도토리 적립 `earn(userId, amount, reason, targetId)` | `reward.service.AcornService` | Part 2 단계 완수(+10, STAGE_COMPLETE, stageId), 나무 완성(+5, TREE_COMPLETE, 나무 번호) |
+| 도토리 사용 `spend(...)` 잔액 부족 시 `ACORN_NOT_ENOUGH` | `reward.service.AcornService` | Part 3 AI 튜터(AI_TUTOR, targetId=null), 스트릭 보호권(STREAK_SHIELD) |
+| 끊김 차감 `penalizeStreakBreak(userId, yyyymmdd)` 잔액 0이면 차감 없음 | `reward.service.AcornService` | Part 2 접속 시 끊김 판정 |
+| 배지 지급 `grant(userId, badgeId)` | `reward.service.BadgeService` | Part 2 |
+| 레벨 테스트 상태 `user.changeLevelTestStatus(DONE/SKIPPED)` | `user.domain.User` | Part 3 |
+| 홈·학습 현황에 들어갈 학습 데이터 | `home.service.LearningStatusReader` 구현 | Part 2 (구현 후 `TempLearningStatusReader` 삭제) |
+| 회원탈퇴 시 데이터 삭제 | `user.domain.UserDeletedEvent`를 `@EventListener`로 받아 `deleteByUserId` | Part 2, Part 3 |
+
+같은 (reason, targetId)는 한 번만 반영되고 두 번째부터는 `false`를 돌려준다. 단계 보상을 중복 지급하지 않으려고 따로 확인할 필요는 없다.
+
+로그인 사용자 id는 컨트롤러 파라미터에 `@LoginUser Long userId`로 받는다. 로그인 없이 부를 API는 `common.config.WebConfig`의 제외 목록에 추가한다.
+
 ## API 규칙
 
 - 경로: `/api/v1/{기능}/...`
