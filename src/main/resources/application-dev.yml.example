@@ -8,6 +8,19 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    defer-datasource-initialization: true   # 테이블 생성 후 data.sql 실행
+  sql:
+    init:
+      mode: always                          # data.sql (기본 캐릭터·배지) 넣기
 
 cors:
   allowed-origins: http://localhost:5173,http://localhost:3000
+
+jwt:
+  secret: ${JWT_SECRET:local-dev-secret-key-change-me-32bytes-or-more}
+
+# 카카오 디벨로퍼스 > 내 애플리케이션 > 앱 키
+kakao:
+  client-id: ${KAKAO_CLIENT_ID:}         # REST API 키
+  client-secret: ${KAKAO_CLIENT_SECRET:} # 보안 > Client Secret 을 켰을 때만
+  admin-key: ${KAKAO_ADMIN_KEY:}         # 회원탈퇴 시 연결 끊기용
