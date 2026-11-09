@@ -22,21 +22,21 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class StageReader {
 
-    private final SectorRepository sectorRepository;
-    private final StageRepository stageRepository;
+	private final SectorRepository sectorRepository;
+	private final StageRepository stageRepository;
 
-    /** 전체 섹터 id (번호 순) */
-    public List<Long> getAllSectorIds() {
-        return sectorRepository.findAllIds();
-    }
+	/** 전체 섹터 id (번호 순) */
+	public List<Long> getAllSectorIds() {
+		return sectorRepository.findAllIds();
+	}
 
-    /** 단계 → 소속 섹터 id, 단계 번호. 없는 단계면 STAGE_NOT_FOUND */
-    public StageInfo getStageInfo(Long stageId) {
-        Stage stage = stageRepository.findById(stageId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.STAGE_NOT_FOUND));
-        return new StageInfo(stage.getId(), stage.getSectorId(), stage.getStepNo());
-    }
+	/** 단계 → 소속 섹터 id, 단계 번호. 없는 단계면 STAGE_NOT_FOUND */
+	public StageInfo getStageInfo(Long stageId) {
+		Stage stage = stageRepository.findById(stageId)
+				.orElseThrow(() -> new BusinessException(ErrorCode.STAGE_NOT_FOUND));
+		return new StageInfo(stage.getId(), stage.getSectorId(), stage.getStepNo());
+	}
 
-    public record StageInfo(Long stageId, Long sectorId, int stepNo) {
-    }
+	public record StageInfo(Long stageId, Long sectorId, int stepNo) {
+	}
 }

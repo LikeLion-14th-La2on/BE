@@ -9,7 +9,7 @@ import com.dotorich.learning.domain.Sector;
 
 public interface SectorRepository extends JpaRepository<Sector, Long> {
 
-    /** 전체 섹터 id (번호 순) */
-    @Query("select s.id from Sector s order by s.id")
-    List<Long> findAllIds();
+	/** 전체 섹터 id (번호 순) */
+	@Query("select s.id from Sector s order by s.id")
+	List<Long> findAllIds();
 }

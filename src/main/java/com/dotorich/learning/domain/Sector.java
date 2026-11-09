@@ -20,21 +20,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Sector {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = false, length = 30)
-    private String name;
+	@Column(nullable = false, length = 30)
+	private String name;
 
-    /** 요일 순환 순서 (오늘의 섹터 계산용) */
-    @Column(name = "rotation_order", nullable = false)
-    private int rotationOrder;
+	/** 요일 순환 순서 (오늘의 섹터 계산용) */
+	@Column(name = "rotation_order", nullable = false)
+	private int rotationOrder;
 
-    /** 테스트용 */
-    public Sector(Long id, String name, int rotationOrder) {
-        this.id = id;
-        this.name = name;
-        this.rotationOrder = rotationOrder;
-    }
+	/** 테스트용 */
+	public Sector(Long id, String name, int rotationOrder) {
+		this.id = id;
+		this.name = name;
+		this.rotationOrder = rotationOrder;
+	}
 }

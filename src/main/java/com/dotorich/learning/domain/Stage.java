@@ -19,29 +19,29 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "stages",
-        uniqueConstraints = @UniqueConstraint(name = "uk_stage", columnNames = {"sector_id", "step_no"}))
+		uniqueConstraints = @UniqueConstraint(name = "uk_stage", columnNames = {"sector_id", "step_no"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Stage {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "sector_id", nullable = false)
-    private Long sectorId;
+	@Column(name = "sector_id", nullable = false)
+	private Long sectorId;
 
-    /** 단계 번호 1~3 */
-    @Column(name = "step_no", nullable = false)
-    private int stepNo;
+	/** 단계 번호 1~3 */
+	@Column(name = "step_no", nullable = false)
+	private int stepNo;
 
-    @Column(nullable = false, length = 50)
-    private String title;
+	@Column(nullable = false, length = 50)
+	private String title;
 
-    /** 테스트용 */
-    public Stage(Long id, Long sectorId, int stepNo, String title) {
-        this.id = id;
-        this.sectorId = sectorId;
-        this.stepNo = stepNo;
-        this.title = title;
-    }
+	/** 테스트용 */
+	public Stage(Long id, Long sectorId, int stepNo, String title) {
+		this.id = id;
+		this.sectorId = sectorId;
+		this.stepNo = stepNo;
+		this.title = title;
+	}
 }
