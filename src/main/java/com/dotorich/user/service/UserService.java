@@ -9,6 +9,7 @@ import com.dotorich.auth.service.KakaoClient;
 import com.dotorich.common.exception.BusinessException;
 import com.dotorich.common.exception.ErrorCode;
 import com.dotorich.reward.service.CharacterService;
+import com.dotorich.user.domain.LevelTestStatus;
 import com.dotorich.user.domain.User;
 import com.dotorich.user.domain.UserDeletedEvent;
 import com.dotorich.user.dto.MeResponse;
@@ -68,6 +69,24 @@ public class UserService {
 			throw new BusinessException(ErrorCode.NICKNAME_DUPLICATED);
 		}
 		return new NicknameResponse(nickname);
+	}
+
+	/**
+	 * 레벨 테스트 결과 제출·건너뛰기 (Part 3 이 호출). status 는 DONE 또는 SKIPPED.
+	 * 이미 했으면 409. 행 잠금이라 동시에 두 번 들어와도 하나만 통과한다.
+	 * 호출하는 쪽 트랜잭션에 묶이므로, 뒤에서 실패하면 상태 변경도 롤백된다.
+	 */
+	@Transactional
+	public void completeLevelTest(Long userId, LevelTestStatus status) {
+		if (status == null || status == LevelTestStatus.NONE) {
+			throw new BusinessException(ErrorCode.INVALID_INPUT);
+		}
+		User user = userRepository.findByIdForUpdate(userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+		if (user.getLevelTestStatus() != LevelTestStatus.NONE) {
+			throw new BusinessException(ErrorCode.LEVEL_TEST_ALREADY_DONE);
+		}
+		user.changeLevelTestStatus(status);
 	}
 
 	/** 회원탈퇴: 카카오 연결 끊기 → 각 파트 데이터 삭제(이벤트) → users 삭제 */
