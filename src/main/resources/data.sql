@@ -7,6 +7,26 @@ INSERT IGNORE INTO characters (id, name, image_url, price) VALUES
 INSERT IGNORE INTO badges (id, name, image_url) VALUES
   (1, '첫 단계 완수', NULL);
 
+-- ===== Part 2: 섹터·단계 시드 =====
+-- id 고정: Part 3 문제 데이터의 stage_id 가 이 번호를 쓴다. 바꾸면 안 된다.
+-- 단계 id 규칙: 주식 1~3, 생활 금융 4~6, 금융 기초 7~9 (섹터마다 3개씩 이어 붙임)
+-- rotation_order(요일 순환 순서)는 순환 규칙 확정 전 임시값.
+INSERT IGNORE INTO sectors (id, name, rotation_order) VALUES
+  (1, '주식', 1),
+  (2, '생활 금융', 2),
+  (3, '금융 기초', 3);
+
+INSERT IGNORE INTO stages (id, sector_id, step_no, title) VALUES
+  (1, 1, 1, '주식 1단계'),
+  (2, 1, 2, '주식 2단계'),
+  (3, 1, 3, '주식 3단계'),
+  (4, 2, 1, '생활 금융 1단계'),
+  (5, 2, 2, '생활 금융 2단계'),
+  (6, 2, 3, '생활 금융 3단계'),
+  (7, 3, 1, '금융 기초 1단계'),
+  (8, 3, 2, '금융 기초 2단계'),
+  (9, 3, 3, '금융 기초 3단계');
+
 -- ===== Part 3: 용어 시드 =====
 -- 예시 숫자는 계산해서 넣은 값. reference(출처)는 확정되면 채운다.
 -- id 를 고정해 두어야 INSERT IGNORE 로 재실행해도 중복이 안 생긴다. 새 용어는 다음 번호부터 추가.

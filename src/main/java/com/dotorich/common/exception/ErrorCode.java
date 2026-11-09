@@ -34,6 +34,7 @@ public enum ErrorCode {
 	CHARACTER_NOT_OWNED(HttpStatus.FORBIDDEN, "E403", "보유하지 않은 캐릭터입니다"),
 
 	// Part 2 (정예원): learning, streak, review
+	STAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "단계를 찾을 수 없습니다"),
 
 	// Part 3 (김민지): leveltest, question, term, tutor, newsquiz
 	TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "아직 준비되지 않은 용어입니다"),
