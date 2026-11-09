@@ -31,11 +31,15 @@ public enum ErrorCode {
 	ACORN_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "E400", "도토리가 부족합니다"),
 	CHARACTER_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "캐릭터를 찾을 수 없습니다"),
 	CHARACTER_ALREADY_OWNED(HttpStatus.CONFLICT, "E409", "이미 보유한 캐릭터입니다"),
-	CHARACTER_NOT_OWNED(HttpStatus.FORBIDDEN, "E403", "보유하지 않은 캐릭터입니다");
+	CHARACTER_NOT_OWNED(HttpStatus.FORBIDDEN, "E403", "보유하지 않은 캐릭터입니다"),
 
 	// Part 2 (정예원): learning, streak, review
 
 	// Part 3 (김민지): leveltest, question, term, tutor, newsquiz
+	TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "아직 준비되지 않은 용어입니다"),
+
+	// 각 파트는 위 구역에 "이름(...)," 형태(끝에 쉼표)로 추가한다. 세미콜론은 이 줄에만 둔다.
+	;
 
 	private final HttpStatus status;
 	private final String code;
