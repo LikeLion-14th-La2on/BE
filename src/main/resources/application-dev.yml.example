@@ -12,6 +12,7 @@ spring:
   sql:
     init:
       mode: always                          # data.sql (기본 캐릭터·배지) 넣기
+      encoding: UTF-8
 
 cors:
   allowed-origins: http://localhost:5173,http://localhost:3000
