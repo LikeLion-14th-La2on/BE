@@ -75,7 +75,8 @@ com.dotorich
 | 도토리 사용 `spend(...)` 잔액 부족 시 `ACORN_NOT_ENOUGH` | `reward.service.AcornService` | Part 3 AI 튜터(AI_TUTOR, targetId=null), 스트릭 보호권(STREAK_SHIELD) |
 | 끊김 차감 `penalizeStreakBreak(userId, yyyymmdd)` 잔액 0이면 차감 없음 | `reward.service.AcornService` | Part 2 접속 시 끊김 판정 |
 | 배지 지급 `grant(userId, badgeId)` | `reward.service.BadgeService` | Part 2 |
-| 레벨 테스트 상태 `user.changeLevelTestStatus(DONE/SKIPPED)` | `user.domain.User` | Part 3 |
+| 레벨 테스트 완료 처리 `completeLevelTest(userId, DONE/SKIPPED)` 이미 했으면 `LEVEL_TEST_ALREADY_DONE`(409), NONE이면 `INVALID_INPUT`(400) | `user.service.UserService` | Part 3 결과 제출·건너뛰기 맨 처음 |
+| 섹터·단계 조회 `getAllSectorIds()`, `getStageInfo(stageId)` → `StageInfo(stageId, sectorId, stepNo)` | `learning.service.StageReader` | Part 3 레벨 테스트 채점 |
 | 홈·학습 현황에 들어갈 학습 데이터 | `home.service.LearningStatusReader` 구현 | Part 2 (구현 후 `TempLearningStatusReader` 삭제) |
 | 회원탈퇴 시 데이터 삭제 | `user.domain.UserDeletedEvent`를 `@EventListener`로 받아 `deleteByUserId` | Part 2, Part 3 |
 
