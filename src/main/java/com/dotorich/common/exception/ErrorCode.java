@@ -32,6 +32,7 @@ public enum ErrorCode {
 	CHARACTER_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "캐릭터를 찾을 수 없습니다"),
 	CHARACTER_ALREADY_OWNED(HttpStatus.CONFLICT, "E409", "이미 보유한 캐릭터입니다"),
 	CHARACTER_NOT_OWNED(HttpStatus.FORBIDDEN, "E403", "보유하지 않은 캐릭터입니다"),
+	LEVEL_TEST_ALREADY_DONE(HttpStatus.CONFLICT, "E409", "이미 레벨 테스트를 완료했습니다"),
 
 	// Part 2 (정예원): learning, streak, review
 
