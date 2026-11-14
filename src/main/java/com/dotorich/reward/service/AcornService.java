@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AcornService {
 
+	public static final int DAILY_STUDY_REWARD = 1;
 	public static final int TREE_COMPLETE_BONUS = 5;
 	public static final int STREAK_BREAK_PENALTY = 1;
 

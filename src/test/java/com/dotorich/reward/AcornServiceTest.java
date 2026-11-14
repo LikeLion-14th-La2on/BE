@@ -43,16 +43,16 @@ class AcornServiceTest {
 
 	@Test
 	void 적립하면_잔액이_늘고_내역이_남는다() {
-		assertTrue(acornService.earn(1L, 10, AcornReason.STAGE_COMPLETE, 3L));
-		assertEquals(10, user.getAcornBalance());
+		assertTrue(acornService.earn(1L, 1, AcornReason.DAILY_STUDY, 20261113L));
+		assertEquals(1, user.getAcornBalance());
 		verify(ledgerRepository).save(any());
 	}
 
 	@Test
-	void 같은_단계_보상은_두번_주지_않는다() {
-		when(ledgerRepository.existsByUserIdAndReasonAndTargetId(any(), eq(AcornReason.STAGE_COMPLETE), eq(3L)))
+	void 같은_날_학습_보상은_두번_주지_않는다() {
+		when(ledgerRepository.existsByUserIdAndReasonAndTargetId(any(), eq(AcornReason.DAILY_STUDY), eq(20261113L)))
 			.thenReturn(true);
-		assertFalse(acornService.earn(1L, 10, AcornReason.STAGE_COMPLETE, 3L));
+		assertFalse(acornService.earn(1L, 1, AcornReason.DAILY_STUDY, 20261113L));
 		assertEquals(0, user.getAcornBalance());
 		verify(ledgerRepository, never()).save(any());
 	}

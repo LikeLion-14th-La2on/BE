@@ -20,10 +20,12 @@ public interface LearningStatusReader {
 		boolean hasCardReview,     // 전날 오답 카드뉴스 복습이 있는지
 		int yesterdayWrongCount,   // 홈 틀린 문제 카드에 쓰는 개수
 		int streakCount,
+		List<Boolean> weekStudied,  // 이번 주 월~일 학습 여부 7개 (KST 기준, 오늘 이후는 false)
 		int shieldCount,
 		int acornCount,            // 지금 나무에 열린 도토리 0~7
 		int treeCount,             // 내 숲에 모은 나무 수
-		boolean acornFell          // 마지막 확인 뒤 끊겨서 도토리가 떨어졌는지
+		int fallenCount,           // 지금 나무에서 떨어져 땅에 쌓인 도토리 수 (나무 완성 시 0으로)
+		boolean acornFell          // 마지막 확인 뒤 끊겨서 도토리가 떨어졌는지 (떨어지는 애니메이션용)
 	) {
 	}
 
