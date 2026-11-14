@@ -71,16 +71,16 @@ com.dotorich
 
 | 무엇 | 어디 | 누가 쓰나 |
 | --- | --- | --- |
-| 도토리 적립 `earn(userId, amount, reason, targetId)` | `reward.service.AcornService` | Part 2 단계 완수(+10, STAGE_COMPLETE, stageId), 나무 완성(+5, TREE_COMPLETE, 나무 번호) |
+| 도토리 적립 `earn(userId, amount, reason, targetId)` | `reward.service.AcornService` | Part 2 하루 학습(+1 `DAILY_STUDY_REWARD`, DAILY_STUDY, 학습 날짜 yyyymmdd), 나무 완성(+5 `TREE_COMPLETE_BONUS`, TREE_COMPLETE, 나무 번호) |
 | 도토리 사용 `spend(...)` 잔액 부족 시 `ACORN_NOT_ENOUGH` | `reward.service.AcornService` | Part 3 AI 튜터(AI_TUTOR, targetId=null), 스트릭 보호권(STREAK_SHIELD) |
 | 끊김 차감 `penalizeStreakBreak(userId, yyyymmdd)` 잔액 0이면 차감 없음 | `reward.service.AcornService` | Part 2 접속 시 끊김 판정 |
-| 배지 지급 `grant(userId, badgeId)` | `reward.service.BadgeService` | Part 2 |
+| 배지 지급 `grant(userId, badgeId)` | `reward.service.BadgeService` | 보류 (6차 회의 이후 배지 미사용) |
 | 레벨 테스트 완료 처리 `completeLevelTest(userId, DONE/SKIPPED)` 이미 했으면 `LEVEL_TEST_ALREADY_DONE`(409), NONE이면 `INVALID_INPUT`(400) | `user.service.UserService` | Part 3 결과 제출·건너뛰기 맨 처음 |
 | 섹터·단계 조회 `getAllSectorIds()`, `getStageInfo(stageId)` → `StageInfo(stageId, sectorId, stepNo)` | `learning.service.StageReader` | Part 3 레벨 테스트 채점 |
 | 홈·학습 현황에 들어갈 학습 데이터 | `home.service.LearningStatusReader` 구현 | Part 2 (구현 후 `TempLearningStatusReader` 삭제) |
 | 회원탈퇴 시 데이터 삭제 | `user.domain.UserDeletedEvent`를 `@EventListener`로 받아 `deleteByUserId` | Part 2, Part 3 |
 
-같은 (reason, targetId)는 한 번만 반영되고 두 번째부터는 `false`를 돌려준다. 단계 보상을 중복 지급하지 않으려고 따로 확인할 필요는 없다.
+같은 (reason, targetId)는 한 번만 반영되고 두 번째부터는 `false`를 돌려준다. 하루 학습 보상을 중복 지급하지 않으려고 따로 확인할 필요는 없다.
 
 로그인 사용자 id는 컨트롤러 파라미터에 `@LoginUser Long userId`로 받는다. 로그인 없이 부를 API는 `common.config.WebConfig`의 제외 목록에 추가한다.
 

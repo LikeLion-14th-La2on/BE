@@ -33,8 +33,8 @@ public class HomeService {
 			s.nextStage(),
 			s.hasCardReview(),
 			s.yesterdayWrongCount(),
-			new HomeResponse.Streak(s.streakCount(), s.shieldCount()),
-			new HomeResponse.Tree(s.acornCount(), s.treeCount(), s.acornFell()),
+			new HomeResponse.Streak(s.streakCount(), s.shieldCount(), s.weekStudied()),
+			new HomeResponse.Tree(s.acornCount(), s.treeCount(), s.fallenCount(), s.acornFell()),
 			user.getAcornBalance(),
 			characterService.getEquippedImageUrl(user));
 	}

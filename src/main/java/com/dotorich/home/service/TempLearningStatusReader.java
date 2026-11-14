@@ -1,5 +1,6 @@
 package com.dotorich.home.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ public class TempLearningStatusReader implements LearningStatusReader {
 
 	@Override
 	public Home read(Long userId) {
-		return new Home(null, false, null, false, 0, 0, 0, 0, 0, false);
+		return new Home(null, false, null, false, 0, 0, Collections.nCopies(7, false), 0, 0, 0, 0, false);
 	}
 
 	@Override

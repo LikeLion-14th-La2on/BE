@@ -1,5 +1,7 @@
 package com.dotorich.home.dto;
 
+import java.util.List;
+
 import com.dotorich.home.service.LearningStatusReader;
 
 public record HomeResponse(
@@ -15,9 +17,9 @@ public record HomeResponse(
 	String characterImageUrl
 ) {
 
-	public record Streak(int currentCount, int shieldCount) {
+	public record Streak(int currentCount, int shieldCount, List<Boolean> weekStudied) {
 	}
 
-	public record Tree(int acornCount, int treeCount, boolean acornFell) {
+	public record Tree(int acornCount, int treeCount, int fallenCount, boolean acornFell) {
 	}
 }
