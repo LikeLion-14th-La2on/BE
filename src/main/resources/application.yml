@@ -10,6 +10,11 @@ spring:
         jdbc:
           time_zone: Asia/Seoul
 
+# AI 튜터 (Part 3). 회의에서 확정되면 숫자만 바꾼다.
+tutor:
+  free-count: 3   # 하루 무료 질문 수 (KST 0시 기준)
+  acorn-cost: 1   # 무료 초과 시 1회당 차감 도토리
+
 server:
   port: 8080
 

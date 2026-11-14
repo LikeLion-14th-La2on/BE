@@ -37,6 +37,7 @@ public enum ErrorCode {
 
 	// Part 3 (김민지): leveltest, question, term, tutor, newsquiz
 	TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "아직 준비되지 않은 용어입니다"),
+	TUTOR_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, "E503", "AI 튜터가 잠시 쉬고 있어요. 잠시 후 다시 물어봐 주세요"),
 
 	// 각 파트는 위 구역에 "이름(...)," 형태(끝에 쉼표)로 추가한다. 세미콜론은 이 줄에만 둔다.
 	;
