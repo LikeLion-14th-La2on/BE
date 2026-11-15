@@ -76,7 +76,8 @@ com.dotorich
 | 끊김 차감 `penalizeStreakBreak(userId, yyyymmdd)` 잔액 0이면 차감 없음 | `reward.service.AcornService` | Part 2 접속 시 끊김 판정 |
 | 배지 지급 `grant(userId, badgeId)` | `reward.service.BadgeService` | 보류 (6차 회의 이후 배지 미사용) |
 | 레벨 테스트 완료 처리 `completeLevelTest(userId, DONE/SKIPPED)` 이미 했으면 `LEVEL_TEST_ALREADY_DONE`(409), NONE이면 `INVALID_INPUT`(400) | `user.service.UserService` | Part 3 결과 제출·건너뛰기 맨 처음 |
-| 섹터·단계 조회 `getAllSectorIds()`, `getStageInfo(stageId)` → `StageInfo(stageId, sectorId, stepNo)` | `learning.service.StageReader` | Part 3 레벨 테스트 채점 |
+| 섹터·단계 조회 `getAllSectors()` → `SectorInfo(sectorId, name)`, `getAllSectorIds()`, `getStageInfo(stageId)` → `StageInfo(stageId, sectorId, stepNo)` | `learning.service.StageReader` | Part 3 레벨 테스트 |
+| 시작 단계 저장 `initStartStages(userId, Map<sectorId, 시작 단계 1~3>)` 앞 단계는 PASSED_BY_TEST, 시작 단계는 UNLOCKED. 이미 기록이 있으면 아무것도 안 함, 없는 단계 번호면 `INVALID_INPUT`(400) | `learning.service.StageProgressService` | Part 3 결과 제출·건너뛰기 |
 | 홈·학습 현황에 들어갈 학습 데이터 | `home.service.LearningStatusReader` 구현 | Part 2 (구현 후 `TempLearningStatusReader` 삭제) |
 | 회원탈퇴 시 데이터 삭제 | `user.domain.UserDeletedEvent`를 `@EventListener`로 받아 `deleteByUserId` | Part 2, Part 3 |
 
