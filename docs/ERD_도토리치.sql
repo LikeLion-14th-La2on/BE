@@ -188,6 +188,7 @@ CREATE TABLE wrong_answers (
   user_id BIGINT NOT NULL,
   question_id BIGINT NOT NULL,
   status VARCHAR(20) NOT NULL COMMENT 'CARD_REVIEW(다음 날 복습 대기)/IN_NOTE(오답노트)/RESOLVED',
+  my_answer TEXT NULL COMMENT '사용자가 고른 답 (답안 제출 형식 그대로: "O", "1", {"용어": "뜻"})',
   wrong_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '주차별 조회 기준',
   PRIMARY KEY (id),
   UNIQUE KEY uk_wrong (user_id, question_id),
