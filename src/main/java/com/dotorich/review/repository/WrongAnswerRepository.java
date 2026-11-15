@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import com.dotorich.review.domain.WrongAnswer;
 import com.dotorich.review.domain.WrongAnswerStatus;
@@ -22,4 +24,9 @@ public interface WrongAnswerRepository extends JpaRepository<WrongAnswer, Long> 
 
 	/** 상태별 오답 전부, 오래된 순 (카드뉴스 복습 조회) */
 	List<WrongAnswer> findAllByUserIdAndStatusOrderByWrongAtAsc(Long userId, WrongAnswerStatus status);
+
+	/** 회원탈퇴 */
+	@Modifying
+	@Query("delete from WrongAnswer w where w.userId = :userId")
+	int deleteAllByUserId(Long userId);
 }
