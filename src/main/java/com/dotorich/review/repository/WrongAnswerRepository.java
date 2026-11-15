@@ -19,4 +19,7 @@ public interface WrongAnswerRepository extends JpaRepository<WrongAnswer, Long> 
 	/** 기간 안의 상태별 오답, 최신순 (오답노트 주차별 조회: start 이상 end 미만) */
 	List<WrongAnswer> findAllByUserIdAndStatusAndWrongAtGreaterThanEqualAndWrongAtLessThanOrderByWrongAtDesc(
 			Long userId, WrongAnswerStatus status, LocalDateTime start, LocalDateTime end);
+
+	/** 상태별 오답 전부, 오래된 순 (카드뉴스 복습 조회) */
+	List<WrongAnswer> findAllByUserIdAndStatusOrderByWrongAtAsc(Long userId, WrongAnswerStatus status);
 }
