@@ -13,6 +13,9 @@ public interface UserStageProgressRepository extends JpaRepository<UserStageProg
 	/** 한 사용자의 여러 단계 상태를 한 번에 */
 	List<UserStageProgress> findAllByUserIdAndStageIdIn(Long userId, Collection<Long> stageIds);
 
+	/** 한 사용자의 단계 상태 전부 (마이페이지 진행도용) */
+	List<UserStageProgress> findAllByUserId(Long userId);
+
 	/** 기록이 있으면 열린 단계 (없으면 잠김) */
 	boolean existsByUserIdAndStageId(Long userId, Long stageId);
 

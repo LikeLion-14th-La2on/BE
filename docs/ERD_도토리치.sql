@@ -118,6 +118,7 @@ CREATE TABLE user_streaks (
   current_count INT NOT NULL DEFAULT 0 COMMENT '연속 학습일',
   last_study_date DATE NULL COMMENT '마지막 학습일 (KST)',
   shield_count INT NOT NULL DEFAULT 0 COMMENT '보유 보호권',
+  last_break_date DATE NULL COMMENT '마지막으로 처리한 끊김 날짜 (같은 끊김 중복 처리 방지)',
   PRIMARY KEY (user_id),
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) COMMENT = '스트릭 (P2)';
