@@ -14,4 +14,7 @@ public interface UserStageProgressRepository extends JpaRepository<UserStageProg
 
 	/** 기록이 있으면 열린 단계 (없으면 잠김) */
 	boolean existsByUserIdAndStageId(Long userId, Long stageId);
+
+	/** 단계 기록이 하나라도 있는지 (레벨 테스트 결과를 이미 저장했는지) */
+	boolean existsByUserId(Long userId);
 }

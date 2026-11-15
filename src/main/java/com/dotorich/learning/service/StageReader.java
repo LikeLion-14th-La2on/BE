@@ -2,6 +2,7 @@ package com.dotorich.learning.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +31,21 @@ public class StageReader {
 		return sectorRepository.findAllIds();
 	}
 
+	/** 전체 섹터 id + 이름 (번호 순) */
+	public List<SectorInfo> getAllSectors() {
+		return sectorRepository.findAll(Sort.by("id")).stream()
+				.map(sector -> new SectorInfo(sector.getId(), sector.getName()))
+				.toList();
+	}
+
 	/** 단계 → 소속 섹터 id, 단계 번호. 없는 단계면 STAGE_NOT_FOUND */
 	public StageInfo getStageInfo(Long stageId) {
 		Stage stage = stageRepository.findById(stageId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.STAGE_NOT_FOUND));
 		return new StageInfo(stage.getId(), stage.getSectorId(), stage.getStepNo());
+	}
+
+	public record SectorInfo(Long sectorId, String name) {
 	}
 
 	public record StageInfo(Long stageId, Long sectorId, int stepNo) {
