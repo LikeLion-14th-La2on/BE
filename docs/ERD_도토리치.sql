@@ -122,6 +122,24 @@ CREATE TABLE user_streaks (
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) COMMENT = '스트릭 (P2)';
 
+CREATE TABLE trees (
+                       id BIGINT NOT NULL AUTO_INCREMENT,
+                       user_id BIGINT NOT NULL,
+                       filled_count INT NOT NULL DEFAULT 0 COMMENT '열린 도토리 0~7',
+                       fallen_count INT NOT NULL DEFAULT 0 COMMENT '끊김으로 떨어진 도토리',
+                       completed_at DATETIME NULL COMMENT 'NULL이면 키우는 중, 값이 있으면 내 숲의 완성 나무',
+                       PRIMARY KEY (id),
+                       KEY idx_tree_user (user_id),
+                       FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) COMMENT = '도토리나무·내 숲 (P2)';
+
+CREATE TABLE study_days (
+                            user_id BIGINT NOT NULL,
+                            study_date DATE NOT NULL COMMENT '하루 학습한 날 (KST)',
+                            PRIMARY KEY (user_id, study_date),
+                            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) COMMENT = '하루 학습 기록 (P2, 홈 요일 표시)';
+
 -- ===== Part 3 =====
 CREATE TABLE terms (
   id BIGINT NOT NULL AUTO_INCREMENT,

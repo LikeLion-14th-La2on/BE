@@ -44,4 +44,17 @@ public class UserStreak {
 	public boolean studiedOn(LocalDate date) {
 		return date.equals(lastStudyDate);
 	}
+
+	/**
+	 * 하루 학습 기록. 어제 학습했으면 +1, 오늘 이미 했으면 그대로, 그 외(처음·끊김)는 1부터.
+	 * 보호권으로 끊김을 막은 경우는 끊김 판정에서 마지막 학습일을 어제로 맞춰 둔다.
+	 */
+	public void recordStudy(LocalDate today) {
+		if (today.equals(lastStudyDate)) {
+			return;
+		}
+		boolean continued = lastStudyDate != null && lastStudyDate.plusDays(1).equals(today);
+		currentCount = continued ? currentCount + 1 : 1;
+		lastStudyDate = today;
+	}
 }

@@ -2,6 +2,7 @@ package com.dotorich.learning.repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -17,4 +18,6 @@ public interface UserStageProgressRepository extends JpaRepository<UserStageProg
 
 	/** 단계 기록이 하나라도 있는지 (레벨 테스트 결과를 이미 저장했는지) */
 	boolean existsByUserId(Long userId);
+
+	Optional<UserStageProgress> findByUserIdAndStageId(Long userId, Long stageId);
 }

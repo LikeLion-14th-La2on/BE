@@ -52,6 +52,14 @@ public class UserStageProgress {
 		this.status = status;
 	}
 
+	/** 완수 처리. 처음 완수한 시각은 바꾸지 않는다 (다시 풀어도 그대로) */
+	public void complete(LocalDateTime now) {
+		if (status != StageStatus.COMPLETED) {
+			completedAt = now;
+		}
+		status = StageStatus.COMPLETED;
+	}
+
 	@EqualsAndHashCode
 	@NoArgsConstructor
 	public static class Key implements Serializable {
