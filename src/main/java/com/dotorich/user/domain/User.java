@@ -3,6 +3,8 @@ package com.dotorich.user.domain;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,6 +42,7 @@ public class User {
 	private LocalDateTime termsAgreedAt;
 
 	@Enumerated(EnumType.STRING)
+	@JdbcTypeCode(SqlTypes.VARCHAR) // MySQL enum 칸이 아닌 varchar 로. enum 값을 추가해도 DB를 고칠 필요가 없다
 	@Column(name = "level_test_status", length = 10, nullable = false)
 	private LevelTestStatus levelTestStatus = LevelTestStatus.NONE;
 

@@ -1,5 +1,8 @@
 package com.dotorich.question.domain;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,10 +34,12 @@ public class Question {
 	private Long stageId;
 
 	@Enumerated(EnumType.STRING)
+	@JdbcTypeCode(SqlTypes.VARCHAR) // MySQL enum 칸이 아닌 varchar 로. enum 값을 추가해도 DB를 고칠 필요가 없다
 	@Column(nullable = false, length = 20)
 	private QuestionPurpose purpose;
 
 	@Enumerated(EnumType.STRING)
+	@JdbcTypeCode(SqlTypes.VARCHAR) // MySQL enum 칸이 아닌 varchar 로. enum 값을 추가해도 DB를 고칠 필요가 없다
 	@Column(nullable = false, length = 20)
 	private QuestionType type;
 
