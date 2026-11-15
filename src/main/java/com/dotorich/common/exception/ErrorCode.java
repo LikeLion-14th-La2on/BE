@@ -37,6 +37,8 @@ public enum ErrorCode {
 	// Part 2 (정예원): learning, streak, review
 	STAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "단계를 찾을 수 없습니다"),
 	SECTOR_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "섹터를 찾을 수 없습니다"),
+	STAGE_LOCKED(HttpStatus.FORBIDDEN, "E403", "아직 열리지 않은 단계입니다"),
+	TODAY_SECTOR_FIRST(HttpStatus.FORBIDDEN, "E403", "오늘의 섹터 학습을 먼저 완료해주세요"),
 
 	// Part 3 (김민지): leveltest, question, term, tutor, newsquiz
 	TERM_NOT_FOUND(HttpStatus.NOT_FOUND, "E404", "아직 준비되지 않은 용어입니다"),
