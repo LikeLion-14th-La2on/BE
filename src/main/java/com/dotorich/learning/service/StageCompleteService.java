@@ -44,6 +44,7 @@ import lombok.RequiredArgsConstructor;
  * 2. 하루 학습(평일: 오늘의 섹터, 일요일: 아무 섹터)이고 오늘 첫 학습이면
  *    학습일 기록, 스트릭, 나무 1칸 + 도토리 +1, 7칸이면 +5 와 새 나무
  * 3. 그 외(추가 풀이, 오늘 이미 학습)는 1번만
+ * 같은 요청이 동시에 두 번 와도 나무가 두 칸 자라지 않도록 맨 앞에서 user_streaks 행을 잠근다.
  */
 @Service
 @RequiredArgsConstructor
@@ -67,6 +68,10 @@ public class StageCompleteService {
 		UserStageProgress progress = progressRepository.findByUserIdAndStageId(userId, stageId)
 				.orElseThrow(() -> new BusinessException(ErrorCode.STAGE_LOCKED));
 
+		// 같은 사용자의 단계 완료·끊김 판정은 여기서부터 한 번에 하나씩 처리된다
+		UserStreak streak = userStreakRepository.findByIdForUpdate(userId)
+				.orElseGet(() -> userStreakRepository.save(new UserStreak(userId)));
+
 		LocalDateTime now = LocalDateTime.now(KstTime.ZONE);
 		LocalDate today = now.toLocalDate();
 
@@ -75,8 +80,6 @@ public class StageCompleteService {
 		Long nextStageId = unlockNextStage(userId, stage);
 
 		// 2. 하루 학습 보상
-		UserStreak streak = userStreakRepository.findById(userId)
-				.orElseGet(() -> userStreakRepository.save(new UserStreak(userId)));
 		boolean dailyRewarded = false;
 		int acornEarned = 0;
 		boolean treeCompleted = false;

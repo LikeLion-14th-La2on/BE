@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
  * 2. 이미 처리한 끊김이면(last_break_date 와 같으면) 아무것도 안 함 → 며칠을 쉬어도 끊김 1회당 1번
  * 3. 보호권이 있으면 1개 써서 연속 기록 유지 (마지막 학습일을 어제로 맞춤)
  * 4. 없으면 스트릭 0, 도토리 1개 차감(잔액 0이면 안 함), 나무에서 1개 떨어뜨림(0칸이면 안 함), 끊김 날짜 기록
+ * 홈 요청이 동시에 두 번 와도 나무가 두 번 깎이지 않도록 user_streaks 행을 잠그고 판정한다.
  */
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class StreakBreakService {
 	/** 끊김을 처리해서 나무 도토리가 떨어졌으면 true (떨어지는 애니메이션용) */
 	@Transactional
 	public boolean check(Long userId, LocalDate today) {
-		UserStreak streak = userStreakRepository.findById(userId).orElse(null);
+		UserStreak streak = userStreakRepository.findByIdForUpdate(userId).orElse(null);
 		if (streak == null) {
 			return false; // 한 번도 학습하지 않은 사용자
 		}
