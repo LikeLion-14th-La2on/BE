@@ -1,5 +1,6 @@
 package com.dotorich.streak.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,7 @@ public interface TreeRepository extends JpaRepository<Tree, Long> {
 
 	/** 내 숲의 완성 나무 수 */
 	long countByUserIdAndCompletedAtIsNotNull(Long userId);
+
+	/** 내 숲의 완성 나무 목록, 완성 시각 최신순 (같은 시각이면 나중 번호 먼저) */
+	List<Tree> findAllByUserIdAndCompletedAtIsNotNullOrderByCompletedAtDescIdDesc(Long userId);
 }
