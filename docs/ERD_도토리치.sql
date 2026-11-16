@@ -118,9 +118,28 @@ CREATE TABLE user_streaks (
   current_count INT NOT NULL DEFAULT 0 COMMENT '연속 학습일',
   last_study_date DATE NULL COMMENT '마지막 학습일 (KST)',
   shield_count INT NOT NULL DEFAULT 0 COMMENT '보유 보호권',
+  last_break_date DATE NULL COMMENT '마지막으로 처리한 끊김 날짜 (같은 끊김 중복 처리 방지)',
   PRIMARY KEY (user_id),
   FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) COMMENT = '스트릭 (P2)';
+
+CREATE TABLE trees (
+                       id BIGINT NOT NULL AUTO_INCREMENT,
+                       user_id BIGINT NOT NULL,
+                       filled_count INT NOT NULL DEFAULT 0 COMMENT '열린 도토리 0~7',
+                       fallen_count INT NOT NULL DEFAULT 0 COMMENT '끊김으로 떨어진 도토리',
+                       completed_at DATETIME NULL COMMENT 'NULL이면 키우는 중, 값이 있으면 내 숲의 완성 나무',
+                       PRIMARY KEY (id),
+                       KEY idx_tree_user (user_id),
+                       FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) COMMENT = '도토리나무·내 숲 (P2)';
+
+CREATE TABLE study_days (
+                            user_id BIGINT NOT NULL,
+                            study_date DATE NOT NULL COMMENT '하루 학습한 날 (KST)',
+                            PRIMARY KEY (user_id, study_date),
+                            FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+) COMMENT = '하루 학습 기록 (P2, 홈 요일 표시)';
 
 -- ===== Part 3 =====
 CREATE TABLE terms (
@@ -188,6 +207,7 @@ CREATE TABLE wrong_answers (
   user_id BIGINT NOT NULL,
   question_id BIGINT NOT NULL,
   status VARCHAR(20) NOT NULL COMMENT 'CARD_REVIEW(다음 날 복습 대기)/IN_NOTE(오답노트)/RESOLVED',
+  my_answer TEXT NULL COMMENT '사용자가 고른 답 (답안 제출 형식 그대로: "O", "1", {"용어": "뜻"})',
   wrong_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '주차별 조회 기준',
   PRIMARY KEY (id),
   UNIQUE KEY uk_wrong (user_id, question_id),
