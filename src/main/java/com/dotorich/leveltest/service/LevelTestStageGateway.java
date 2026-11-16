@@ -7,7 +7,7 @@ import com.dotorich.learning.service.StageReader.StageInfo;
 
 /**
  * 레벨 테스트가 Part 2(섹터·단계)에 묻고 저장하는 창구.
- * 지금은 TempLevelTestStageGateway 가 구현한다. Part 2 함수가 다 나오면 그 파일만 바꾼다.
+ * 구현: LearningStageGateway (StageReader, StageProgressService 연결)
  */
 public interface LevelTestStageGateway {
 
