@@ -89,7 +89,7 @@ public class SessionService {
 				.orElse(false);
 		Optional<Sector> todaySector = todaySectorFinder.find(today);
 
-		// 일요일(오늘의 섹터 없음)은 제한 없음. 일요일 규칙 확정 전까지의 처리
+		// 일요일(오늘의 섹터 없음)은 자유 학습이라 아무 섹터나 풀 수 있다
 		boolean otherSector = todaySector.isPresent() && !todaySector.get().getId().equals(stage.getSectorId());
 		if (!todayCompleted && otherSector) {
 			throw new BusinessException(ErrorCode.TODAY_SECTOR_FIRST);
