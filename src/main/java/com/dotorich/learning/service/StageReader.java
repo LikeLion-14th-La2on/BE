@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * 다른 파트가 섹터·단계 정보를 읽는 창구 (읽기 전용).
- * Part 3 레벨 테스트 채점에서 쓴다. Repository 를 직접 쓰지 말고 이 함수를 쓴다.
+ * Part 3 레벨 테스트(LearningStageGateway)에서 쓴다. Repository 를 직접 쓰지 말고 이 함수를 쓴다.
  */
 @Service
 @RequiredArgsConstructor
@@ -25,11 +25,6 @@ public class StageReader {
 
 	private final SectorRepository sectorRepository;
 	private final StageRepository stageRepository;
-
-	/** 전체 섹터 id (번호 순) */
-	public List<Long> getAllSectorIds() {
-		return sectorRepository.findAllIds();
-	}
 
 	/** 전체 섹터 id + 이름 (번호 순) */
 	public List<SectorInfo> getAllSectors() {
