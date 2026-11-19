@@ -1,0 +1,25 @@
+# 배포 서버(EC2)용 MySQL. 서버 안에서만 접속하도록 127.0.0.1 에만 연다.
+# 실행: cd /home/ubuntu/app && docker compose -f docker-compose.prod.yml --env-file .env up -d
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: dotorich-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: dotorich
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "127.0.0.1:3306:3306"
+    # ponytail: 1GB 인스턴스라 메모리를 줄여 둔다. 사용자가 늘면 buffer-pool 부터 올린다
+    command: >
+      --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=128M --innodb-log-buffer-size=8M --max-connections=50
+      --performance-schema=OFF
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:

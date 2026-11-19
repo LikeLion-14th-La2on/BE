@@ -41,6 +41,8 @@ out/
 application-*.yml
 application-dev.yml
 !application-*.yml.example
+# 배포용 설정은 값 없이 환경변수(${...})만 참조하므로 추적한다
+!application-prod.yml
 .env
 .env.*
 !.env.example
