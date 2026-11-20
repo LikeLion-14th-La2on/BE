@@ -1,0 +1,44 @@
+# 배포 서버(EC2)용: 앱 + MySQL 을 한 번에 띄운다 (멋사 배포 세션 방식)
+# 실행: cd deploy && docker compose up -d --build   (.env 는 이 폴더에 둔다, docs/배포_가이드.md)
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: dotorich-app
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"   # 외부는 Nginx(80)로만. 보안 그룹에서 8080 을 열어도 바로 붙지 않게
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/dotorich?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    container_name: dotorich-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: dotorich
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    # ponytail: 1GB 서버라 메모리를 줄여 둔다. 사용자가 늘면 buffer-pool 부터 올린다
+    command: >
+      --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=128M --max-connections=50 --performance-schema=OFF
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]   # TCP 로 확인 (초기화 중 임시 서버는 소켓만 열어서 localhost 면 너무 일찍 통과)
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  db_data:
