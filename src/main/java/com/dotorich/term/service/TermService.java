@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class TermService {
 
 	public static final int SEARCH_LIMIT = 30;
+	public static final int MENTIONED_LIMIT = 3;
 	private static final int KEYWORD_MAX_LENGTH = 50;
 
 	private final TermRepository termRepository;
@@ -76,6 +77,12 @@ public class TermService {
 	public Term getTerm(Long termId) {
 		return termRepository.findById(termId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.TERM_NOT_FOUND));
+	}
+
+	/** 글(AI 튜터 질문) 안에 나온 다른 용어. 용어가 수십 개라 전부 읽어 메모리에서 찾는다 */
+	@Transactional(readOnly = true)
+	public List<Term> findMentionedTerms(String text, Long excludeId) {
+		return TermMatcher.findMentioned(termRepository.findAll(), text, excludeId, MENTIONED_LIMIT);
 	}
 
 	@EventListener
