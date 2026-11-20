@@ -1,6 +1,7 @@
 package com.dotorich.tutor.service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import com.dotorich.tutor.dto.TutorResponse;
  *
  * 1. 용어가 없으면 404
  * 2. 오늘 무료 횟수를 다 썼는데 도토리가 부족하면 LLM 을 부르기 전에 400
- * 3. LLM 호출 (실패하면 503, 횟수·도토리 그대로)
+ * 3. 질문에 나온 다른 용어(최대 3개)를 함께 넘겨 LLM 호출 (실패하면 503, 횟수·도토리 그대로)
  * 4. 답을 받은 뒤에만 횟수 +1, 무료 초과분 도토리 차감
  *
  * LLM 호출(수 초)을 DB 트랜잭션·행 잠금 밖에서 해서, 그동안 다른 요청을 막지 않는다.
@@ -54,7 +55,9 @@ public class TutorService {
 			throw new BusinessException(ErrorCode.ACORN_NOT_ENOUGH);
 		}
 
-		String answer = tutorClient.ask(term, question.trim());
+		String trimmed = question.trim();
+		List<Term> related = termService.findMentionedTerms(trimmed, termId);
+		String answer = tutorClient.ask(term, related, trimmed);
 
 		TutorUsageService.Recorded recorded = usageService.record(userId, today, freeCount, acornCost);
 		int freeRemaining = Math.max(0, freeCount - recorded.countAfter());

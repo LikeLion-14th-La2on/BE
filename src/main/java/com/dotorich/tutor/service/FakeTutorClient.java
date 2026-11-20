@@ -1,5 +1,7 @@
 package com.dotorich.tutor.service;
 
+import java.util.List;
+
 import com.dotorich.term.domain.Term;
 
 /**
@@ -9,8 +11,10 @@ import com.dotorich.term.domain.Term;
 public class FakeTutorClient implements TutorClient {
 
 	@Override
-	public String ask(Term term, String question) {
+	public String ask(Term term, List<Term> related, String question) {
+		String others = related.isEmpty() ? ""
+			: " (함께 나온 용어: " + String.join(", ", related.stream().map(Term::getName).toList()) + ")";
 		return "[개발용 가짜 답변] " + term.getName() + "은(는) " + term.getEasyExplanation()
-			+ "이에요. (질문: " + question + ")";
+			+ "이에요." + others + " (질문: " + question + ")";
 	}
 }
