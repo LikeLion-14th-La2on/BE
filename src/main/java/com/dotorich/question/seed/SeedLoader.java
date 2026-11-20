@@ -2,6 +2,7 @@ package com.dotorich.question.seed;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dotorich.question.domain.QuestionPurpose;
 import com.dotorich.question.domain.QuestionType;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import tools.jackson.databind.ObjectMapper;
  * 문항·용어 시드 로더 (P3). 서버가 켜질 때 resources/seed 의 JSON 두 개를 DB 에 넣는다.
  *
  * - seed_terms.json → terms, seed_questions.json → questions, question_terms
+ * - 시사 퀴즈(purpose = NEWS)는 publishDate 로 news_quizzes 에도 넣는다 (같은 날짜면 문제를 바꾼다)
  * - 같은 id 는 덮어쓴다. 검수 후 JSON 을 고쳐 다시 배포하면 수정 내용이 반영된다.
  * - 형식이 맞지 않는 줄은 건너뛰고 ERROR 로그에 id 와 이유를 남긴다 (나머지는 그대로 들어간다).
  * - JSON 에서 빠진 id 는 지우지 않는다 (오답 기록이 참조할 수 있어서). 로그로만 알린다.
@@ -119,9 +122,24 @@ public class SeedLoader implements ApplicationRunner {
 			for (Long termId : q.termIds() == null ? List.<Long>of() : q.termIds()) {
 				jdbc.update("insert into question_terms (question_id, term_id) values (?, ?)", q.id(), termId);
 			}
+			if (QuestionPurpose.NEWS.name().equals(q.purpose().trim())) {
+				upsertNewsQuiz(q.id(), SeedValidator.parseDate(q.publishDate()));
+			}
 			count++;
 		}
 		return count;
+	}
+
+	/**
+	 * 게시일 기준으로 넣는다. quizId(news_quizzes.id)가 배포할 때마다 바뀌지 않도록 지우고 다시 넣지 않는다.
+	 * 문제의 게시일이 바뀌었으면 예전 날짜 줄만 지운다.
+	 */
+	private void upsertNewsQuiz(Long questionId, LocalDate publishDate) {
+		jdbc.update("delete from news_quizzes where question_id = ? and publish_date <> ?", questionId, publishDate);
+		jdbc.update("""
+			insert into news_quizzes (question_id, publish_date) values (?, ?) as new
+			on duplicate key update question_id = new.question_id
+			""", questionId, publishDate);
 	}
 
 	/** DB 에는 있는데 JSON 에서 빠진 id 를 알린다 (지우지는 않는다) */
