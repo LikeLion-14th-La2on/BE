@@ -1,0 +1,32 @@
+package com.dotorich.review.repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import com.dotorich.review.domain.WrongAnswer;
+import com.dotorich.review.domain.WrongAnswerStatus;
+
+public interface WrongAnswerRepository extends JpaRepository<WrongAnswer, Long> {
+
+	Optional<WrongAnswer> findByUserIdAndQuestionId(Long userId, Long questionId);
+
+	/** 상태별 개수 (카드뉴스 복습 대기 수 등) */
+	long countByUserIdAndStatus(Long userId, WrongAnswerStatus status);
+
+	/** 기간 안의 상태별 오답, 최신순 (오답노트 주차별 조회: start 이상 end 미만) */
+	List<WrongAnswer> findAllByUserIdAndStatusAndWrongAtGreaterThanEqualAndWrongAtLessThanOrderByWrongAtDesc(
+			Long userId, WrongAnswerStatus status, LocalDateTime start, LocalDateTime end);
+
+	/** 상태별 오답 전부, 오래된 순 (카드뉴스 복습 조회) */
+	List<WrongAnswer> findAllByUserIdAndStatusOrderByWrongAtAsc(Long userId, WrongAnswerStatus status);
+
+	/** 회원탈퇴 */
+	@Modifying
+	@Query("delete from WrongAnswer w where w.userId = :userId")
+	int deleteAllByUserId(Long userId);
+}
