@@ -1,9 +1,11 @@
 package com.dotorich.auth.service;
 
+import java.time.Duration;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class KakaoClient {
 
-	private final RestClient restClient = RestClient.create();
+	private final RestClient restClient;
 	private final String clientId;
 	private final String clientSecret;
 	private final String adminKey;
@@ -35,6 +37,10 @@ public class KakaoClient {
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 		this.adminKey = adminKey;
+		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+		factory.setConnectTimeout(Duration.ofSeconds(3));
+		factory.setReadTimeout(Duration.ofSeconds(5));
+		this.restClient = RestClient.builder().requestFactory(factory).build();
 	}
 
 	/** 인가 코드 → 카카오 회원번호 */
@@ -60,7 +66,11 @@ public class KakaoClient {
 				.header("Authorization", "Bearer " + token.get("access_token"))
 				.retrieve()
 				.body(Map.class);
-			return String.valueOf(me.get("id"));
+			Object id = me.get("id");
+			if (id == null) {
+				throw new BusinessException(ErrorCode.KAKAO_AUTH_FAILED);
+			}
+			return String.valueOf(id);
 		} catch (RestClientException | NullPointerException e) {
 			log.warn("카카오 로그인 실패: {}", e.getMessage());
 			throw new BusinessException(ErrorCode.KAKAO_AUTH_FAILED);

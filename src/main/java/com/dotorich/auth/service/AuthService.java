@@ -54,7 +54,10 @@ public class AuthService {
 		if (userId == null || saved == null || saved.isExpired() || !saved.getUserId().equals(userId)) {
 			throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
 		}
-		refreshTokenRepository.delete(saved);
+		// 먼저 지운 요청만 새 토큰을 받는다
+		if (refreshTokenRepository.deleteByToken(refreshToken) == 0) {
+			throw new BusinessException(ErrorCode.INVALID_REFRESH_TOKEN);
+		}
 		return issueTokens(userId);
 	}
 
