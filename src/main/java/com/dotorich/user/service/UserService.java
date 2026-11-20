@@ -55,7 +55,9 @@ public class UserService {
 	/** 온보딩 닉네임 등록. 이미 등록했으면 409 (수정은 2순위 닉네임 수정 API) */
 	@Transactional
 	public NicknameResponse registerNickname(Long userId, String nickname) {
-		User user = getUser(userId);
+		// 같은 사용자가 동시에 두 번 등록하지 않도록 행 잠금
+		User user = userRepository.findByIdForUpdate(userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 		if (user.isNicknameSet()) {
 			throw new BusinessException(ErrorCode.NICKNAME_ALREADY_SET);
 		}

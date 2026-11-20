@@ -3,6 +3,7 @@ package com.dotorich.user.domain;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -21,8 +22,10 @@ import lombok.NoArgsConstructor;
 /**
  * users (P1). 도토리 잔액(acornBalance)은 reward.AcornService 로만 바꾼다.
  * 레벨 테스트 상태는 Part 3 이 changeLevelTestStatus 로 바꾼다.
+ * DynamicUpdate: 바뀐 칸만 UPDATE 해서, 잠금 없는 저장이 acorn_balance 를 옛 값으로 덮지 않게 한다.
  */
 @Getter
+@DynamicUpdate
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

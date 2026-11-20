@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,12 +46,19 @@ public class CharacterService {
 
 	@Transactional
 	public PurchaseCharacterResponse purchase(Long userId, Long characterId) {
+		// 첫 조회를 행 잠금으로 해야 REPEATABLE READ 스냅샷이 앞 요청의 커밋 뒤에 잡힌다
+		userRepository.findByIdForUpdate(userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 		Character character = getCharacter(characterId);
 		if (userCharacterRepository.existsByUserIdAndCharacterId(userId, characterId)) {
 			throw new BusinessException(ErrorCode.CHARACTER_ALREADY_OWNED);
 		}
-		acornService.spend(userId, character.getPrice(), AcornReason.CHARACTER, characterId);
-		userCharacterRepository.save(new UserCharacter(userId, characterId));
+		try {
+			acornService.spend(userId, character.getPrice(), AcornReason.CHARACTER, characterId);
+			userCharacterRepository.saveAndFlush(new UserCharacter(userId, characterId));
+		} catch (DataIntegrityViolationException e) {
+			throw new BusinessException(ErrorCode.CHARACTER_ALREADY_OWNED);
+		}
 		return new PurchaseCharacterResponse(characterId, acornService.getBalance(userId));
 	}
 
