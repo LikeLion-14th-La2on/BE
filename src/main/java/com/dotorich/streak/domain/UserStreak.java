@@ -1,6 +1,7 @@
 package com.dotorich.streak.domain;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +21,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserStreak {
 
+	/** 최대 보유 보호권 (11/17 확정) */
+	public static final int MAX_SHIELDS = 2;
+
 	@Id
 	@Column(name = "user_id")
 	private Long userId;
@@ -32,7 +36,7 @@ public class UserStreak {
 	@Column(name = "last_study_date")
 	private LocalDate lastStudyDate;
 
-	/** 보유 보호권 */
+	/** 보유 보호권 (최대 2개) */
 	@Column(name = "shield_count", nullable = false)
 	private int shieldCount;
 
@@ -51,7 +55,7 @@ public class UserStreak {
 
 	/**
 	 * 하루 학습 기록. 어제 학습했으면 +1, 오늘 이미 했으면 그대로, 그 외(처음·끊김)는 1부터.
-	 * 보호권으로 끊김을 막은 경우는 useShield 에서 마지막 학습일을 어제로 맞춰 둔다.
+	 * 보호권으로 끊김을 막은 경우는 useShields 에서 마지막 학습일을 어제로 맞춰 둔다.
 	 */
 	public void recordStudy(LocalDate today) {
 		if (today.equals(lastStudyDate)) {
@@ -74,14 +78,31 @@ public class UserStreak {
 		return breakDate.equals(lastBreakDate) ? null : breakDate;
 	}
 
-	public boolean hasShield() {
-		return shieldCount > 0;
+	/** 학습을 빠진 날 수 (마지막 학습일 다음 날 ~ 어제). 한 번도 학습하지 않았으면 0 */
+	public int missedDays(LocalDate today) {
+		if (lastStudyDate == null) {
+			return 0;
+		}
+		return (int) Math.max(0, ChronoUnit.DAYS.between(lastStudyDate, today) - 1);
 	}
 
-	/** 보호권으로 끊김을 막는다. 연속 기록은 유지하고, 오늘 학습하면 +1 이 되도록 마지막 학습일을 어제로 맞춘다 */
-	public void useShield(LocalDate today) {
-		shieldCount--;
+	/**
+	 * 보호권으로 끊김을 막는다 (1개당 하루). 연속 기록은 유지하고,
+	 * 오늘 학습하면 +1 이 되도록 마지막 학습일을 어제로 맞춘다.
+	 */
+	public void useShields(int count, LocalDate today) {
+		shieldCount -= count;
 		lastStudyDate = today.minusDays(1);
+	}
+
+	/** 보호권을 더 살 수 없는지 */
+	public boolean isShieldFull() {
+		return shieldCount >= MAX_SHIELDS;
+	}
+
+	/** 보호권 1개 추가 (구매) */
+	public void addShield() {
+		shieldCount++;
 	}
 
 	/** 끊김 처리: 연속 기록 0, 처리한 끊김 날짜 기록 */
