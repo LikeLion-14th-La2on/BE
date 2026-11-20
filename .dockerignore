@@ -3,5 +3,10 @@
 build
 .idea
 *.iml
-.env
-src/main/resources/application-dev.yml
+**/.env
+**/*.pem
+**/*.key
+**/application-*.yml
+!**/application-prod.yml
+deploy
+docs

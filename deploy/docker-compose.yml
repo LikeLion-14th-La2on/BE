@@ -8,7 +8,7 @@ services:
     container_name: dotorich-app
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"   # 외부는 Nginx(80)로만. 보안 그룹에서 8080 을 열어도 바로 붙지 않게
     env_file: .env
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -34,10 +34,11 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]   # TCP 로 확인 (초기화 중 임시 서버는 소켓만 열어서 localhost 면 너무 일찍 통과)
       interval: 5s
       timeout: 5s
       retries: 20
+      start_period: 30s
 
 volumes:
   db_data:

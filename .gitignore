@@ -46,3 +46,7 @@ application-dev.yml
 .env
 .env.*
 !.env.example
+
+# SSH 키 (EC2 .pem 등) 절대 커밋 금지
+*.pem
+*.key
