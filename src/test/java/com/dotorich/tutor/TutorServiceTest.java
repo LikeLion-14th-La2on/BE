@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -11,6 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +49,7 @@ class TutorServiceTest {
 		tutorClient = mock(TutorClient.class);
 		tutorService = new TutorService(termService, usageService, acornService, tutorClient, FREE, COST);
 		when(termService.getTerm(10L)).thenReturn(term);
-		when(tutorClient.ask(eq(term), anyString())).thenReturn("답변");
+		when(tutorClient.ask(eq(term), anyList(), anyString())).thenReturn("답변");
 	}
 
 	@Test
@@ -61,7 +64,20 @@ class TutorServiceTest {
 		assertEquals(2, response.freeRemaining());
 		assertEquals(0, response.acornSpent());
 		assertEquals(30, response.acornBalance());
-		verify(tutorClient).ask(term, "이자가 적은 건?");
+		verify(tutorClient).ask(term, List.of(), "이자가 적은 건?");
+	}
+
+	@Test
+	void 질문에_나온_다른_용어를_함께_넘긴다() {
+		Term other = new Term(9L, "원금균등상환", "원금을 매달 같은 금액으로 나눠 갚는 방식", "원금을 똑같이 나눠 갚는 방식", null, null);
+		when(termService.findMentionedTerms("원금균등상환이랑 뭐가 달라요?", 10L)).thenReturn(List.of(other));
+		when(usageService.getCount(anyLong(), any())).thenReturn(0);
+		when(usageService.record(eq(1L), any(), eq(FREE), eq(COST)))
+			.thenReturn(new TutorUsageService.Recorded(1, 0, 30));
+
+		tutorService.ask(1L, 10L, "원금균등상환이랑 뭐가 달라요?");
+
+		verify(tutorClient).ask(term, List.of(other), "원금균등상환이랑 뭐가 달라요?");
 	}
 
 	@Test
@@ -86,14 +102,14 @@ class TutorServiceTest {
 		BusinessException e = assertThrows(BusinessException.class, () -> tutorService.ask(1L, 10L, "질문"));
 
 		assertEquals(ErrorCode.ACORN_NOT_ENOUGH, e.getErrorCode());
-		verify(tutorClient, never()).ask(any(), anyString());
+		verify(tutorClient, never()).ask(any(), anyList(), anyString());
 		verify(usageService, never()).record(anyLong(), any(), anyInt(), anyInt());
 	}
 
 	@Test
 	void LLM이_실패하면_횟수도_도토리도_그대로() {
 		when(usageService.getCount(anyLong(), any())).thenReturn(0);
-		when(tutorClient.ask(eq(term), anyString())).thenThrow(new BusinessException(ErrorCode.TUTOR_UNAVAILABLE));
+		when(tutorClient.ask(eq(term), anyList(), anyString())).thenThrow(new BusinessException(ErrorCode.TUTOR_UNAVAILABLE));
 
 		BusinessException e = assertThrows(BusinessException.class, () -> tutorService.ask(1L, 10L, "질문"));
 
@@ -106,6 +122,6 @@ class TutorServiceTest {
 		when(termService.getTerm(99L)).thenThrow(new BusinessException(ErrorCode.TERM_NOT_FOUND));
 
 		assertThrows(BusinessException.class, () -> tutorService.ask(1L, 99L, "질문"));
-		verify(tutorClient, never()).ask(any(), anyString());
+		verify(tutorClient, never()).ask(any(), anyList(), anyString());
 	}
 }
