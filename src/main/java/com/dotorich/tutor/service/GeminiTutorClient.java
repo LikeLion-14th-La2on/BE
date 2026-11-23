@@ -1,6 +1,9 @@
 package com.dotorich.tutor.service;
 
+import java.net.SocketTimeoutException;
 import java.net.http.HttpClient;
+import java.net.http.HttpConnectTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
@@ -25,7 +28,9 @@ import tools.jackson.databind.ObjectMapper;
  * Gemini generateContent REST 호출.
  * https://ai.google.dev/gemini-api/docs/generate-content/text-generation
  * 최신 모델은 temperature 를 무시하고 나중에 400 을 줄 수 있다고 해서 넣지 않는다.
- * HTTP 클라이언트는 Java 기본 HttpClient (HTTP/2 지원). 네트워크 오류는 한 번 다시 시도한다.
+ * HTTP 클라이언트는 Java 기본 HttpClient (HTTP/2 지원).
+ * 연결이 끊기는 등 네트워크 오류는 한 번 다시 시도한다. 응답 대기 시간 초과는 Gemini 가 답을 만드는 중일 수 있어
+ * 다시 보내면 같은 질문을 두 번 호출하게 되므로(대기 시간 2배, 무료 한도 2회 사용) 다시 시도하지 않는다.
  * 응답은 바이트로 받아 직접 JSON(UTF-8) 으로 읽는다 (Content-Type 이 이상해도 읽을 수 있고, 실패하면 원인을 로그로 남긴다).
  */
 @Slf4j
@@ -74,7 +79,7 @@ public class GeminiTutorClient implements TutorClient {
 		}
 	}
 
-	/** 네트워크 오류(연결 끊김 등)는 한 번만 다시 시도한다. HTTP 오류 응답(4xx, 5xx)은 다시 시도하지 않는다 */
+	/** 네트워크 오류(연결 끊김 등)는 한 번만 다시 시도한다. HTTP 오류 응답(4xx, 5xx)과 응답 대기 시간 초과는 다시 시도하지 않는다 */
 	private ResponseEntity<byte[]> call(Term term, Map<String, Object> body) {
 		for (int attempt = 1; ; attempt++) {
 			try {
@@ -91,11 +96,19 @@ public class GeminiTutorClient implements TutorClient {
 				Throwable cause = NestedExceptionUtils.getMostSpecificCause(e);
 				log.warn("AI 튜터 호출 실패 (termId={}, {}번째 시도): {} / 원인: {}: {}", term.getId(), attempt,
 					e.getMessage(), cause.getClass().getSimpleName(), cause.getMessage());
-				if (attempt >= MAX_ATTEMPTS) {
+				if (attempt >= MAX_ATTEMPTS || isResponseTimeout(cause)) {
 					throw new BusinessException(ErrorCode.TUTOR_UNAVAILABLE);
 				}
 			}
 		}
+	}
+
+	/** 요청은 보냈는데 답을 기다리다 시간이 초과된 경우. 연결 단계 시간 초과는 요청이 안 갔으므로 다시 시도해도 된다 */
+	static boolean isResponseTimeout(Throwable cause) {
+		if (cause instanceof HttpConnectTimeoutException) {
+			return false;
+		}
+		return cause instanceof HttpTimeoutException || cause instanceof SocketTimeoutException;
 	}
 
 	private static String abbreviate(String body) {
