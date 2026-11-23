@@ -7,6 +7,7 @@
 결과: src/main/resources/seed/seed_terms.json, seed_questions.json
 서버가 켜질 때 question.seed.SeedLoader 가 이 두 파일을 읽어 DB 에 넣는다 (같은 id 는 덮어쓰기).
 검수용 칸(검수자, 상태, 코멘트)은 버린다. 상태가 "삭제"인 줄은 넣지 않는다.
+시사 퀴즈(purpose = NEWS)는 publishDate 칸에 게시일(2026-11-23 형식)을 적는다. sector, stage 는 비운다.
 """
 import csv
 import json
@@ -62,6 +63,7 @@ def convert_questions(path):
         "answer": json_cell(r["answer"]),
         "explanation": r["explanation"],
         "source": blank_to_none(r.get("source")),
+        "publishDate": blank_to_none(r.get("publishDate")),
     } for r in rows(path)]
 
 

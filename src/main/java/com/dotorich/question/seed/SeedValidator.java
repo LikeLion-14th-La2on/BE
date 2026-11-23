@@ -1,5 +1,7 @@
 package com.dotorich.question.seed;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -57,6 +59,14 @@ public final class SeedValidator {
 		}
 		if (purpose == QuestionPurpose.LEVEL_TEST && type == QuestionType.MATCHING) {
 			problems.add("레벨 테스트에는 MATCHING 을 쓰지 않음");
+		}
+		if (purpose == QuestionPurpose.NEWS) {
+			if (type == QuestionType.MATCHING) {
+				problems.add("시사 퀴즈에는 MATCHING 을 쓰지 않음");
+			}
+			if (parseDate(q.publishDate()) == null) {
+				problems.add("시사 퀴즈는 publishDate(yyyy-MM-dd)가 필요함: " + q.publishDate());
+			}
 		}
 		if (isBlank(q.prompt()) || isBlank(q.explanation())) {
 			problems.add("prompt 또는 explanation 없음");
@@ -118,6 +128,18 @@ public final class SeedValidator {
 			}
 		}
 		return null;
+	}
+
+	/** "yyyy-MM-dd" 를 날짜로. 비었거나 형식이 틀리면 null */
+	public static LocalDate parseDate(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+		try {
+			return LocalDate.parse(value.trim());
+		} catch (DateTimeParseException e) {
+			return null;
+		}
 	}
 
 	private static <E extends Enum<E>> E enumOf(Class<E> type, String value) {
