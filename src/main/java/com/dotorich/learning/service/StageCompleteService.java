@@ -45,7 +45,7 @@ import lombok.RequiredArgsConstructor;
  * 단계 완수 (P2).
  * 0. 끊김 판정을 먼저 한다 (홈을 거치지 않고 바로 학습해도 보호권 사용·벌칙이 빠지지 않게)
  * 1. 단계를 COMPLETED 로, 같은 섹터 다음 단계가 잠겨 있으면 UNLOCKED 로
- * 2. 하루 학습이고 오늘 첫 학습이면 학습일 기록, 스트릭, 나무 1칸 + 도토리 +1, 7칸이면 +5 와 새 나무
+ * 2. 하루 학습이고 오늘 첫 학습이면 학습일 기록, 스트릭, 나무 1칸 + 도토리 +1, 7칸이면 수확 보너스 +5 와 새 나무
  *    - 하루 학습: 평일은 오늘의 섹터, 일요일(오늘의 섹터 없음)은 아무 섹터
  *    - 이미 끝낸 단계(완료·레벨 테스트 통과)를 다시 풀면, 그 섹터의 모든 단계를 끝낸 경우에만 인정
  * 3. 그 외(추가 풀이, 오늘 이미 학습)는 1번만
@@ -97,6 +97,7 @@ public class StageCompleteService {
 		boolean dailyRewarded = false;
 		int acornEarned = 0;
 		boolean treeCompleted = false;
+		int treeBonus = 0;
 		Tree tree = treeRepository.findFirstByUserIdAndCompletedAtIsNull(userId).orElse(null);
 
 		if (dailyStudy && !streak.studiedOn(today)) {
@@ -114,7 +115,8 @@ public class StageCompleteService {
 			if (tree.grow(now)) {
 				treeCompleted = true;
 				if (acornService.earn(userId, AcornService.TREE_COMPLETE_BONUS, AcornReason.TREE_COMPLETE, tree.getId())) {
-					acornEarned += AcornService.TREE_COMPLETE_BONUS;
+					treeBonus = AcornService.TREE_COMPLETE_BONUS;
+					acornEarned += treeBonus;
 				}
 				tree = treeRepository.save(Tree.start(userId)); // 완성된 나무는 내 숲으로, 새 나무 시작
 			}
@@ -131,6 +133,8 @@ public class StageCompleteService {
 				streak.getCurrentCount(),
 				treeInfo,
 				treeCompleted,
+				(int) treeRepository.countByUserIdAndCompletedAtIsNotNull(userId),
+				treeBonus,
 				countStageTerms(stageId),
 				wrongAnswerRepository.countByUserIdAndStatus(userId, WrongAnswerStatus.CARD_REVIEW),
 				nextStageId);
