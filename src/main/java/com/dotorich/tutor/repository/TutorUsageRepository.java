@@ -16,11 +16,18 @@ public interface TutorUsageRepository extends JpaRepository<TutorUsage, TutorUsa
 
 	Optional<TutorUsage> findByUserIdAndUsageDate(Long userId, LocalDate usageDate);
 
-	/** 오늘 행이 없으면 0으로 만든다. 이미 있으면 무시 (동시에 와도 PK 충돌 없음). MySQL 전용 */
+	/**
+	 * 오늘 행이 없으면 0으로 만든다. 이미 있으면 그대로 둔다. MySQL 전용.
+	 * insert ignore 는 중복일 때 공유 잠금만 잡아서, 같은 사용자 첫 질문이 동시에 오면 둘 다 공유 잠금을 쥔 채
+	 * 다음 findForUpdate 에서 서로 배타 잠금을 기다려 교착(500)이 났다 (#18).
+	 * on duplicate key update 는 처음부터 배타 잠금을 잡아 요청이 한 줄로 선다.
+	 */
 	@Modifying
-	@Query(value = "insert ignore into tutor_usage (user_id, usage_date, count) values (:userId, :usageDate, 0)",
-		nativeQuery = true)
-	int insertIgnore(Long userId, LocalDate usageDate);
+	@Query(value = """
+		insert into tutor_usage (user_id, usage_date, count) values (:userId, :usageDate, 0)
+		on duplicate key update count = count
+		""", nativeQuery = true)
+	int createIfAbsent(Long userId, LocalDate usageDate);
 
 	/** 횟수를 올리기 전에 행 잠금 (같은 사용자 질문이 동시에 와도 무료 횟수를 한 번씩만 쓰게) */
 	@Lock(LockModeType.PESSIMISTIC_WRITE)

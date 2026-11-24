@@ -85,4 +85,10 @@ class SeedValidatorTest {
 		assertFalse(SeedValidator.checkQuestion(noDate, TERMS, null).isEmpty());
 		assertFalse(SeedValidator.checkQuestion(badDate, TERMS, null).isEmpty());
 	}
+
+	@Test
+	void 보기_번호가_정수가_아니면_실패() {
+		assertFalse(SeedValidator.checkQuestion(
+			q("LEARNING", "MULTIPLE", List.of("a", "b", "c"), 1.5, List.of()), TERMS, 1L).isEmpty());
+	}
 }

@@ -3,6 +3,7 @@ package com.dotorich.question.seed;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +23,8 @@ import com.dotorich.question.domain.QuestionType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -57,8 +60,8 @@ public class SeedLoader implements ApplicationRunner {
 			log.info("[시드] seed.enabled=false 라 건너뜀");
 			return;
 		}
-		List<SeedTerm> terms = read(TERMS, SeedTerm[].class);
-		List<SeedQuestion> questions = read(QUESTIONS, SeedQuestion[].class);
+		List<SeedTerm> terms = read(TERMS, SeedTerm.class);
+		List<SeedQuestion> questions = read(QUESTIONS, SeedQuestion.class);
 		if (terms.isEmpty() && questions.isEmpty()) {
 			log.info("[시드] {} / {} 없음, 건너뜀", TERMS, QUESTIONS);
 			return;
@@ -152,13 +155,33 @@ public class SeedLoader implements ApplicationRunner {
 		}
 	}
 
-	private <T> List<T> read(String path, Class<T[]> type) throws IOException {
+	private <T> List<T> read(String path, Class<T> type) throws IOException {
 		ClassPathResource resource = new ClassPathResource(path);
 		if (!resource.exists()) {
 			return List.of();
 		}
 		try (InputStream in = resource.getInputStream()) {
-			return List.of(objectMapper.readValue(in, type));
+			return parseRows(objectMapper, in, type, path);
 		}
+	}
+
+	/**
+	 * JSON 배열을 한 줄씩 읽는다. 형식이 틀린 줄(예: 목록 자리에 문자열)은 건너뛰고 ERROR 로그만 남겨서,
+	 * 한 줄 때문에 서버 시작이 실패하지 않게 한다 (#24). 파일 자체가 배열이 아니면 그대로 실패한다.
+	 */
+	static <T> List<T> parseRows(ObjectMapper objectMapper, InputStream in, Class<T> type, String path) {
+		JsonNode root = objectMapper.readTree(in);
+		if (!root.isArray()) {
+			throw new IllegalStateException(path + " 는 JSON 배열이어야 합니다");
+		}
+		List<T> rows = new ArrayList<>();
+		for (JsonNode row : root) {
+			try {
+				rows.add(objectMapper.treeToValue(row, type));
+			} catch (JacksonException e) {
+				log.error("[시드] {} id={} 줄을 읽지 못해 건너뜀: {}", path, row.path("id"), e.getOriginalMessage());
+			}
+		}
+		return rows;
 	}
 }

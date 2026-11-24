@@ -37,7 +37,7 @@ public class TutorUsageService {
 	 */
 	@Transactional
 	public Recorded record(Long userId, LocalDate date, int freeCount, int acornCost) {
-		usageRepository.insertIgnore(userId, date);
+		usageRepository.createIfAbsent(userId, date);
 		TutorUsage usage = usageRepository.findForUpdate(userId, date)
 			.orElseThrow(() -> new BusinessException(ErrorCode.INTERNAL_ERROR));
 		int spent = 0;
