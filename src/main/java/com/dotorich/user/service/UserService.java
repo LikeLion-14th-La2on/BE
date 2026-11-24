@@ -61,6 +61,21 @@ public class UserService {
 		if (user.isNicknameSet()) {
 			throw new BusinessException(ErrorCode.NICKNAME_ALREADY_SET);
 		}
+		return applyNickname(user, nickname);
+	}
+
+	/** 마이페이지 닉네임 수정 (2순위). 지금과 같은 닉네임이면 그대로 성공, 다른 사람이 쓰는 닉네임이면 409 */
+	@Transactional
+	public NicknameResponse updateNickname(Long userId, String nickname) {
+		User user = userRepository.findByIdForUpdate(userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+		if (nickname.equals(user.getNickname())) {
+			return new NicknameResponse(nickname);
+		}
+		return applyNickname(user, nickname);
+	}
+
+	private NicknameResponse applyNickname(User user, String nickname) {
 		if (userRepository.existsByNickname(nickname)) {
 			throw new BusinessException(ErrorCode.NICKNAME_DUPLICATED);
 		}

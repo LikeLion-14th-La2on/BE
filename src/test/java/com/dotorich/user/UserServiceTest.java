@@ -21,11 +21,12 @@ import com.dotorich.user.service.UserService;
 class UserServiceTest {
 
 	private UserService userService;
+	private UserRepository userRepository;
 	private User user;
 
 	@BeforeEach
 	void setUp() {
-		UserRepository userRepository = mock(UserRepository.class);
+		userRepository = mock(UserRepository.class);
 		userService = new UserService(userRepository, null, null, null);
 		user = User.kakao("1");
 		when(userRepository.findByIdForUpdate(anyLong())).thenReturn(Optional.of(user));
@@ -51,5 +52,28 @@ class UserServiceTest {
 		BusinessException e = assertThrows(BusinessException.class,
 			() -> userService.completeLevelTest(1L, LevelTestStatus.NONE));
 		assertEquals(ErrorCode.INVALID_INPUT, e.getErrorCode());
+	}
+
+	@Test
+	void 닉네임_수정() {
+		user.changeNickname("도토리");
+		assertEquals("다람쥐", userService.updateNickname(1L, "다람쥐").nickname());
+		assertEquals("다람쥐", user.getNickname());
+	}
+
+	@Test
+	void 지금과_같은_닉네임이면_중복_검사_없이_성공() {
+		user.changeNickname("도토리");
+		when(userRepository.existsByNickname("도토리")).thenReturn(true);
+		assertEquals("도토리", userService.updateNickname(1L, "도토리").nickname());
+	}
+
+	@Test
+	void 다른_사람이_쓰는_닉네임으로_수정하면_NICKNAME_DUPLICATED() {
+		user.changeNickname("도토리");
+		when(userRepository.existsByNickname("다람쥐")).thenReturn(true);
+		BusinessException e = assertThrows(BusinessException.class, () -> userService.updateNickname(1L, "다람쥐"));
+		assertEquals(ErrorCode.NICKNAME_DUPLICATED, e.getErrorCode());
+		assertEquals("도토리", user.getNickname());
 	}
 }
