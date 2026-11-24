@@ -2,6 +2,7 @@ package com.dotorich.user.controller;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +55,13 @@ public class UserController {
 	public ApiResponse<NicknameResponse> registerNickname(@LoginUser Long userId,
 		@Valid @RequestBody NicknameRequest request) {
 		return ApiResponse.ok(userService.registerNickname(userId, request.nickname()));
+	}
+
+	@Operation(summary = "닉네임 수정 (마이페이지)")
+	@PatchMapping("/me/nickname")
+	public ApiResponse<NicknameResponse> updateNickname(@LoginUser Long userId,
+		@Valid @RequestBody NicknameRequest request) {
+		return ApiResponse.ok(userService.updateNickname(userId, request.nickname()));
 	}
 
 	@Operation(summary = "회원탈퇴")

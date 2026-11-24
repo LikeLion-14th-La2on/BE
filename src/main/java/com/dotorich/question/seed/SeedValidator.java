@@ -96,7 +96,8 @@ public final class SeedValidator {
 			case MULTIPLE, SITUATION -> {
 				if (!(options instanceof List<?> list) || list.size() < 2) {
 					problems.add("보기(options)가 2개 이상인 목록이어야 함");
-				} else if (!(answer instanceof Number n) || n.intValue() < 0 || n.intValue() >= list.size()) {
+				} else if (!(answer instanceof Number n) || n.doubleValue() != n.intValue()
+					|| n.intValue() < 0 || n.intValue() >= list.size()) {
 					problems.add("정답은 보기 번호 0~" + (list.size() - 1));
 				}
 			}
