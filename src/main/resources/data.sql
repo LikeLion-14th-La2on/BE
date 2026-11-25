@@ -1,8 +1,10 @@
 -- 개발용 기본 데이터. application-dev.yml 의 spring.sql.init.mode=always 일 때만 실행된다.
--- ponytail: 캐릭터 가격·이미지는 미정이라 임시값. 확정되면 여기만 고친다.
+-- 캐릭터 가격: 모범생 20, 바캉스 30, 부자 50 (11/25 확정, 하루 학습 +1·나무 완성 +5 기준 약 2~4주). 그림은 FE src/assets/characters/{code}/ 에 있다.
 INSERT IGNORE INTO characters (id, code, name, image_url, price) VALUES
   (1, 'basic', '기본 다람쥐', 'https://placehold.co/200x200?text=squirrel', 0),
-  (2, 'rich', '부자 다람쥐', 'https://placehold.co/200x200?text=rich', 50);
+  (2, 'rich', '부자 다람쥐', 'https://placehold.co/200x200?text=rich', 50),
+  (3, 'student', '모범생 다람쥐', 'https://placehold.co/200x200?text=student', 20),
+  (4, 'summer', '바캉스 다람쥐', 'https://placehold.co/200x200?text=summer', 30);
 -- code 칸이 생기기 전에 들어간 행 (배포 서버) 에도 채운다. INSERT IGNORE 는 이미 있는 행을 건너뛰기 때문
 UPDATE characters SET code = 'basic' WHERE id = 1 AND code IS NULL;
 UPDATE characters SET code = 'rich' WHERE id = 2 AND code IS NULL;
