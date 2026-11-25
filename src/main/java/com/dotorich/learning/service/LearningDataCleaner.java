@@ -3,6 +3,7 @@ package com.dotorich.learning.service;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.dotorich.learning.repository.QuestionReportRepository;
 import com.dotorich.learning.repository.UserStageProgressRepository;
 import com.dotorich.review.repository.WrongAnswerRepository;
 import com.dotorich.streak.repository.StudyDayRepository;
@@ -25,6 +26,7 @@ public class LearningDataCleaner {
 	private final StudyDayRepository studyDayRepository;
 	private final TreeRepository treeRepository;
 	private final WrongAnswerRepository wrongAnswerRepository;
+	private final QuestionReportRepository reportRepository;
 
 	@EventListener
 	public void onUserDeleted(UserDeletedEvent event) {
@@ -34,5 +36,6 @@ public class LearningDataCleaner {
 		studyDayRepository.deleteAllByUserId(userId);
 		treeRepository.deleteAllByUserId(userId);
 		wrongAnswerRepository.deleteAllByUserId(userId);
+		reportRepository.deleteAllByUserId(userId);
 	}
 }
