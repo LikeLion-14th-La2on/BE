@@ -1,8 +1,11 @@
 -- 개발용 기본 데이터. application-dev.yml 의 spring.sql.init.mode=always 일 때만 실행된다.
 -- ponytail: 캐릭터 가격·이미지는 미정이라 임시값. 확정되면 여기만 고친다.
-INSERT IGNORE INTO characters (id, name, image_url, price) VALUES
-  (1, '기본 다람쥐', 'https://placehold.co/200x200?text=squirrel', 0),
-  (2, '부자 다람쥐', 'https://placehold.co/200x200?text=rich', 50);
+INSERT IGNORE INTO characters (id, code, name, image_url, price) VALUES
+  (1, 'basic', '기본 다람쥐', 'https://placehold.co/200x200?text=squirrel', 0),
+  (2, 'rich', '부자 다람쥐', 'https://placehold.co/200x200?text=rich', 50);
+-- code 칸이 생기기 전에 들어간 행 (배포 서버) 에도 채운다. INSERT IGNORE 는 이미 있는 행을 건너뛰기 때문
+UPDATE characters SET code = 'basic' WHERE id = 1 AND code IS NULL;
+UPDATE characters SET code = 'rich' WHERE id = 2 AND code IS NULL;
 
 INSERT IGNORE INTO badges (id, name, image_url) VALUES
   (1, '첫 단계 완수', NULL);

@@ -21,6 +21,10 @@ public class Character {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	/** FE 그림 폴더 이름 (src/assets/characters/{code}/). 예: basic, rich */
+	@Column(length = 30)
+	private String code;
+
 	@Column(nullable = false, length = 50)
 	private String name;
 

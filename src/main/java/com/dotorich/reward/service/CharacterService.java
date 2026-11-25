@@ -39,7 +39,7 @@ public class CharacterService {
 			.map(UserCharacter::getCharacterId)
 			.collect(Collectors.toSet());
 		return characterRepository.findAllByOrderByPriceAscIdAsc().stream()
-			.map(c -> new CharacterResponse(c.getId(), c.getName(), c.getImageUrl(), c.getPrice(),
+			.map(c -> new CharacterResponse(c.getId(), c.getCode(), c.getName(), c.getImageUrl(), c.getPrice(),
 				owned.contains(c.getId()), c.getId().equals(user.getEquippedCharacterId())))
 			.toList();
 	}
